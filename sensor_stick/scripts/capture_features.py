@@ -16,14 +16,15 @@ from sensor_msgs.msg import PointCloud2
 
 
 def get_normals(cloud):
-    get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
+    get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals',
+                                          GetNormals)
     return get_normals_prox(cloud).cluster
 
 
 if __name__ == '__main__':
     rospy.init_node('capture_node')
 
-    models = [\
+    models0 = [\
        'beer',
        'bowl',
        'create',
@@ -32,6 +33,36 @@ if __name__ == '__main__':
        'plastic_cup',
        'soda_can']
 
+    # pick_list_1
+    models1 = [\
+        'biscuits',
+        'soap',
+        'soap2']
+
+    # pick_list_2
+    models2 = [\
+        'biscuits',
+        'soap',
+        'book',
+        'soap2',
+        'glue']
+
+    # pick_list_3
+    models3 = [\
+        'sticky_notes',
+        'book',
+        'snacks',
+        'biscuits',
+        'eraser',
+        'soap2',
+        'soap',
+        'glue']
+
+    # input parameters
+    models = models3
+    num_samples = 1000
+    num_attempts = 10
+
     # Disable gravity and delete the ground plane
     initial_setup()
     labeled_features = []
@@ -39,11 +70,11 @@ if __name__ == '__main__':
     for model_name in models:
         spawn_model(model_name)
 
-        for i in range(5):
+        for i in range(num_samples):
             # make five attempts to get a valid a point cloud then give up
             sample_was_good = False
             try_count = 0
-            while not sample_was_good and try_count < 5:
+            while not sample_was_good and try_count < num_attempts:
                 sample_cloud = capture_sample()
                 sample_cloud_arr = ros_to_pcl(sample_cloud).to_array()
 
@@ -53,9 +84,9 @@ if __name__ == '__main__':
                     try_count += 1
                 else:
                     sample_was_good = True
-
+            print('{0}% Complete!\n'.format((i+1)/num_samples*100))
             # Extract histogram features
-            chists = compute_color_histograms(sample_cloud, using_hsv=False)
+            chists = compute_color_histograms(sample_cloud, using_hsv=True)
             normals = get_normals(sample_cloud)
             nhists = compute_normal_histograms(normals)
             feature = np.concatenate((chists, nhists))

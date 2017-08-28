@@ -32,15 +32,19 @@ def compute_color_histograms(cloud, using_hsv=False):
         channel_1_vals.append(color[0])
         channel_2_vals.append(color[1])
         channel_3_vals.append(color[2])
-    
-    # TODO: Compute histograms
 
-    # TODO: Concatenate and normalize the histograms
+    # Compute histograms
+    nbins = 128
+    # bins_range = (0, 256)
+    c1_hist, _  = np.histogram(channel_1_vals, bins=nbins) # , range=bins_range)
+    c2_hist, _  = np.histogram(channel_2_vals, bins=nbins) # , range=bins_range)
+    c3_hist, _  = np.histogram(channel_3_vals, bins=nbins) # , range=bins_range)
 
-    # Generate random features for demo mode.  
-    # Replace normed_features with your feature vector
-    normed_features = np.random.random(96) 
-    return normed_features 
+    # Concatenate and normalize the histograms
+    hist_features = np.concatenate((c1_hist, c2_hist, c3_hist)).astype(np.float64)
+
+    normed_features = hist_features / np.sum(hist_features).astype(np.float64)
+    return normed_features
 
 
 def compute_normal_histograms(normal_cloud):
@@ -55,12 +59,17 @@ def compute_normal_histograms(normal_cloud):
         norm_y_vals.append(norm_component[1])
         norm_z_vals.append(norm_component[2])
 
-    # TODO: Compute histograms of normal values (just like with color)
+    # Compute histograms of normal values (just like with color)
+    nbins = 64
+    norm_x_hist, _  = np.histogram(norm_x_vals, bins=nbins)
+    norm_y_hist, _  = np.histogram(norm_y_vals, bins=nbins)
+    norm_z_hist, _  = np.histogram(norm_z_vals, bins=nbins)
 
-    # TODO: Concatenate and normalize the histograms
 
-    # Generate random features for demo mode.  
+    # Concatenate and normalize the histograms
+    hist_features = np.concatenate((norm_x_hist, norm_y_hist, norm_z_hist)).astype(np.float64)
+    # Generate random features for demo mode.
     # Replace normed_features with your feature vector
-    normed_features = np.random.random(96)
+    normed_features = hist_features / np.sum(hist_features).astype(np.float64)
 
     return normed_features
