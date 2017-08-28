@@ -137,6 +137,10 @@ ENV/
 .mypy_cache/
 
 
-# MacOS Specific
+# ### MacOS Specific ###
 .DS_Store
+
+
+# *.swp files created by VIM
+*.swp
 
